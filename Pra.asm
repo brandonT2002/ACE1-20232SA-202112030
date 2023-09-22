@@ -94,18 +94,24 @@ pedir_entrada:
 		jmp pedir_entrada
 		;; - Pedir nombres [OK]
 jugar:
-		print nl
-
-		print mensaje_nombre_a
-		print offset buffer_nombre
+		mov DX, offset mensaje_nombre_a
+		mov AH, 09
+		int 21
+		mov DX, offset buffer_nombre
+		mov AH, 0a
+		int 21
 		;; leímos la cadena
 		mov DI, offset nombre_a
 		call copiar_cadena
 		;;
-		print nl
+		mov DX, offset nl
+		mov AH, 09
+		int 21
 		;;
-		print offset mensaje_nombre_b
-		print offset buffer_nombre
+		mov DX, offset mensaje_nombre_b
+		mov AH, 09
+		int 21
+		mov DX, offset buffer_nombre
 		mov AH, 0a
 		int 21
 		;;
