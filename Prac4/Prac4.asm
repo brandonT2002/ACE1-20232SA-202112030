@@ -28,10 +28,12 @@ suma_label              db      02 dup (0a), "SUMA$"
 resta_label             db      02 dup (0a), "RESTA$"
 multiplicacion_label    db      02 dup (0a), "MULTIPLICACION$"
 division_label          db      02 dup (0a), "DIVISION$"
+factorial_label         db      02 dup (0a), "FACTORIAL$"
 buffer_num1             db      03 dup (00)
 cadena_num              db      03 dup (30)
 n_num1                  dw      00
 n_resultado             dw      00
+n_auxiliar              dw      00
 buffer_entrada          db      21, 00
                         db      21 dup (00)
 .CODE
@@ -41,6 +43,63 @@ print macro texto
         mov DX, offset texto
         mov AH, 09
         int 21
+endm
+
+printnum macro num
+        local printCero, printUno, printDos, printTres, printCuatro, printSeis, printVCuatro, terminar
+                cmp num, 00
+                je printCero
+                cmp num, 01
+                je printUno
+                cmp num, 02
+                je printDos
+                cmp num, 03
+                je printTres
+                cmp num, 04
+                je printCuatro
+                cmp num, 06
+                je printSeis
+                cmp num, 18
+                je printVCuatro
+        printCero:
+                mov DL, '0'
+                mov AH, 02
+                int 21
+                jmp terminar
+        printUno:
+                mov DL, '1'
+                mov AH, 02
+                int 21
+                jmp terminar
+        printDos:
+                mov DL, '2'
+                mov AH, 02
+                int 21
+                jmp terminar
+        printTres:
+                mov DL, '3'
+                mov AH, 02
+                int 21
+                jmp terminar
+        printCuatro:
+                mov DL, '4'
+                mov AH, 02
+                int 21
+                jmp terminar
+        printSeis:
+                mov DL, '6'
+                mov AH, 02
+                int 21
+                jmp terminar
+        printVCuatro:
+                mov DL, '2'
+                mov AH, 02
+                int 21
+                mov DL, '4'
+                mov AH, 02
+                int 21
+                jmp terminar
+        terminar:
 endm
 
 stoi macro numero, cadena
@@ -163,9 +222,12 @@ pedir_entrada:
 
         cmp AL, '2'
         je calculadora
+        cmp AL, '3'
+        je factorial
         cmp AL, '5'
         je fin
         jmp pedir_entrada
+;;============================ MODO CALCULADORA ============================
 calculadora:
 pedir_operando:
         print input_num1
@@ -314,6 +376,84 @@ mostrarResultado:
 	mov DX, offset cadena_num
 	mov AH, 40
 	int 21
+        print nl
+        mov n_resultado, 00
+        jmp menuPrincipal
+;;=========================== FACTORIAL ===========================
+factorial:
+        print factorial_label
+        print input_num1
+        ;; GUARDAR ENTRADA EN BUFFER
+        mov DX, offset buffer_entrada
+        mov AH, 0a
+        int 21
+        ;; GUARDAR EN N_NUM
+        memcpy buffer_num1, buffer_entrada
+        ;; CADENA A NUMERO
+        stoi n_num1, buffer_num1
+        ;; LIMPIAR BUFFER
+        memset buffer_num1, 03
+        cmp n_num1, 00
+        jl factorial
+        cmp n_num1, 04
+        jg factorial
+loopFactorial:
+        mov DL, 0a
+        mov AH, 02
+        int 21
+        mov DL, '!'
+        mov AH, 02
+        int 21
+        mov n_resultado, 00
+        printnum n_resultado
+        mov n_resultado, 01
+        cmp n_num1, 00
+        je terminar_factorial
+        mov SI, 01 ;; CONTADOR SI = 0
+        mov DL, '='
+        mov AH, 02
+        int 21
+        printnum SI
+        mov DL, ';'
+        mov AH, 02
+        int 21
+        mov DL, ' '
+        mov AH, 02
+        int 21
+iteracion:
+        ;; OPERACION FACTORIAL
+        mov AX, n_resultado
+        mov n_auxiliar, AX
+        mul SI
+        mov n_resultado, AX
+        ;; IMPRESION
+        mov DL, '!'
+        mov AH, 02
+        int 21
+        printnum SI
+        mov DL, '='
+        mov AH, 02
+        int 21
+        printnum n_auxiliar
+        mov DL, '*'
+        mov AH, 02
+        int 21
+        printnum SI
+        mov DL, '='
+        mov AH, 02
+        int 21
+        printnum n_resultado
+        mov DL, ';'
+        mov AH, 02
+        int 21
+        mov DL, ' '
+        mov AH, 02
+        int 21
+        ;; INCREMENTO
+        inc SI
+        cmp SI, n_num1
+        jle iteracion
+terminar_factorial:
         print nl
         mov n_resultado, 00
         jmp menuPrincipal
