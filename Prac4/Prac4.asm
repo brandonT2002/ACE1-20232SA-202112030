@@ -209,7 +209,6 @@ inicio:
         print lineas
         print esquina4
         print nl
-
 menuPrincipal:
         ;;
         print nl
@@ -219,7 +218,8 @@ pedir_entrada:
         ;; PULSACIÓN DE TECLA
         mov AH, 08
         int 21
-
+        cmp AL, '1'
+        je cargar_archivo
         cmp AL, '2'
         je calculadora
         cmp AL, '3'
@@ -227,6 +227,15 @@ pedir_entrada:
         cmp AL, '5'
         je fin
         jmp pedir_entrada
+;;============================ LECTURA DE ARCHIVO ===========================
+cargar_archivo:
+        jmp menuPrincipal
+leer_archivo:
+        ;; ABRIR ARCHIVO
+        mov AL, 02
+        mov AH, 3d
+        mov DX, offset ruta_archivo
+        int 21
 ;;============================ MODO CALCULADORA ============================
 calculadora:
 pedir_operando:

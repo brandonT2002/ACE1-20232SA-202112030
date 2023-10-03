@@ -1,60 +1,45 @@
-# Práctica 1 - ASM
+# Práctica 2 - ASM
 ## 1. Manual de Usuario
 
-Al ingresar al juego se mostrará un mensaje con los datos del curso y se debe presionar *Enter* para continuar con la aplicación.
-Seguidamente se mostrará un menú para acceder a las distintas funcionalidades del juego.
+Se mostrará un menú con las funcionalidades requeridas para la realización de las operaciones
 
 <p align="center">
-    <img src="Img/1.png" width="350px">
-    <img src="Img/2.png" width="350px">
+    <img src="Img/6.png" width="350px">
 </p>
 
-Al iniciar una partida del juego conect4, se solicita el nombre de los jugadores que se van a enfrentar y seguidamente comenzará el juego.
+1.1. Modo Calculadora
+
+Se debe ingresar un operando seguido del signo de la operación que se desee realizar, se podrán realizar todas las operaciones que sean necesarias y para obtener el resultado final se debe ingresar el signo "="
 
 <p align="center">
-    <img src="Img/3.png" width="350px">
+    <img src="Img/7.png" width="350px">
 </p>
 
-Al comenzar la partida se solicitará el nombre de la columna donde sea desea agregar una ficha, al momento de que un jugador logre posicionar 4 de sus fichas, ya sea de forma horizontal, vertical o diagonal, se dará por finalizada la partida y se mostrará el ganador.
+1.2. Factorial
+
+Se debe ingresar el número al cuál se desea calcular el factorial. Se permite calculaar el factorial únicamente de números del rango de 0 a 4
 
 <p align="center">
-    <img src="Img/4.png" width="350px">
-    <img src="Img/5.png" width="335px">
+    <img src="Img/8.png" width="350px">
 </p>
 
 ## 2. Manual Técnico
 
-### Inicialización de Datos
-El código comienza con la inicialización de datos y la definición de constantes, como las fichas de los jugadores y elementos gráficos del tablero. Algunas de las constantes incluyen:
+### Funcionalidad Principal
+A continuación, se describen las principales funcionalidades del programa:
 
-* ficha_a y ficha_b: Representan las fichas de los jugadores.
-* esquina1, esquina2, esquina3, esquina4, lateral1, y lateral2: Definen elementos gráficos para el tablero.
-* universidad, facultad, datos personales, entre otros.
+**Menú Principal**
 
-### Segmentos y Pila
-El código declara segmentos y define la pila para el programa:
+Al inicio del programa, se muestra un menú principal que permite al usuario elegir entre varias opciones, incluyendo cargar un archivo, ingresar al modo calculadora, calcular factoriales, crear un reporte o salir del programa.
 
-* STACK: Se declara la pila para gestionar las llamadas a las subrutinas y las interrupciones del sistema.
-* DATA: Inicia la sección de datos donde se definen las variables y constantes utilizadas en el programa.
+**Cargar Archivo**
 
-### Macros y Rutinas
-Se define una macro llamada print que simplifica la impresión de texto en pantalla utilizando la interrupción 21h de DOS. Esta macro se utiliza para mostrar mensajes y elementos gráficos en el juego.
+Si el usuario selecciona la opción "Cargar Archivo", el programa solicita el nombre del archivo a cargar y procede a abrirlo. Sin embargo, en el código proporcionado, la funcionalidad real de carga de archivos no está implementada, por lo que este proceso es un bucle infinito que regresa al menú principal.
 
-### Inicio del Programa
-El programa comienza con la etiqueta .STARTUP y muestra una serie de mensajes de presentación, incluyendo el nombre de la universidad, facultad, curso y nombre del estudiante.
+**Modo Calculadora**
 
-### Menú Principal
-El juego muestra un menú principal con tres opciones: Jugar, Cargar y Salir. Se lee la entrada del usuario y se procesa para determinar la opción seleccionada.
+El modo calculadora permite al usuario realizar operaciones matemáticas simples, como suma, resta, multiplicación y división. El programa solicita dos operandos y un operador (+, -, *, /) para realizar la operación. El resultado se muestra en pantalla.
 
-### Jugar
-* El juego inicia solicitando los nombres de los jugadores.
-* Muestra un tablero vacío y permite a los jugadores seleccionar una columna para colocar sus fichas.
-* Se valida si alguien ha ganado o si el tablero está lleno, y se muestra un mensaje correspondiente.
-* El juego continúa alternando entre los jugadores hasta que alguien gane o el tablero esté lleno.
+**Cálculo de Factoriales**
 
-### Funciones y Procedimientos
-El código incluye varios procedimientos para realizar tareas específicas, como copiar cadenas, convertir letras en números, validar el tablero lleno, validar si alguien ha ganado, buscar un espacio vacío en una columna y obtener el valor de una casilla del tablero.
-
-### Limpieza y Finalización
-* El juego ofrece la opción de volver al menú principal o salir del programa.
-* Se limpia el tablero después de cada juego.
+Si el usuario selecciona la opción "Factorial" en el menú principal, el programa solicita un número y calcula su factorial. Los factoriales de números del 0 al 4 se calculan y se muestran en pantalla.
