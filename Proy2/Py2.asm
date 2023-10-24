@@ -6,7 +6,8 @@ CARRIL      equ      04
 CARRO1      equ      05
 CARRO2      equ      06
 CARRO3      equ      07
-OBJETIVO    equ      08
+CARRO4      equ      08
+OBJETIVO    equ      09
 
 USUARIO_NORMAL         equ 01
 USUARIO_ADMIN          equ 02
@@ -93,6 +94,15 @@ data_sprite_carro3  db   13, 00, 00, 13, 13, 00, 00, 13
                     db   2a, 4e, 4e, 2a, 2a, 2a, 4e, 2a
                     db   2a, 2a, 2a, 2a, 2a, 2a, 2a, 2a
                     db   1f, 00, 00, 13, 1f, 00, 00, 13
+dim_sprite_carro4   db   08, 08
+data_sprite_carro4  db   13, 00, 00, 13, 13, 00, 00, 13
+                    db   43, 43, 43, 43, 43, 43, 43, 43
+                    db   43, 4e, 4e, 43, 43, 43, 4e, 43
+                    db   43, 4e, 4e, 43, 43, 43, 4e, 43
+                    db   43, 4e, 4e, 43, 43, 43, 4e, 43
+                    db   43, 4e, 4e, 43, 43, 43, 4e, 43
+                    db   43, 43, 43, 43, 43, 43, 43, 43
+                    db   1f, 00, 00, 13, 1f, 00, 00, 13
 dim_sprite_obj      db   08, 08
 data_sprite_obj     db   17, 17, 17, 17, 17, 17, 17, 17
                     db   17, 17, 17, 1a, 17, 17, 17, 17
@@ -152,8 +162,12 @@ xContador           db   00
 yContador           db   00
 vidas               db   03
 puntos              dw   00
-transcurrido        dw   00
-velocidad           dw   1000
+transcurrido1       dw   00
+transcurrido2       dw   00
+transcurrido3       dw   00
+velocidad1          dw   1000
+velocidad2          dw   900
+velocidad3          dw   800
 ;; MENÚS
 opcion              db   00
 ;; CONTROLES
@@ -377,7 +391,24 @@ endm
         print esquina3
         print lineas
         print esquina4
-		
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
+		call delay
 
 menu_inicial:
         call menu_inicial_opciones
@@ -524,7 +555,9 @@ cargar_carros1:
         mov loc19, 32
         mov loc20, -01
         mov loc21, 28
-        mov [velocidad], 1000
+        mov [velocidad1], 1000
+        mov [velocidad2], 900
+        mov [velocidad3], 800
         jmp cargar_un_nivel
 
 cargar_carros2:
@@ -570,7 +603,9 @@ cargar_carros2:
         mov loc19, 34
         mov loc20, 31
         mov loc21, -8
-        mov [velocidad], 750
+        mov [velocidad1], 750
+		mov [velocidad2], 650
+        mov [velocidad3], 550
         jmp cargar_un_nivel
 
 cargar_carros3:
@@ -616,7 +651,9 @@ cargar_carros3:
         mov loc19, -1f
         mov loc20, -10
         mov loc21, 29
-        mov [velocidad], 400
+        mov [velocidad1], 400
+		mov [velocidad2], 300
+        mov [velocidad3], 200
         jmp cargar_un_nivel
 
 ciclo_juego:
@@ -634,15 +671,33 @@ ciclo_juego1:
 		call incrementarTiempo
 		call entrada_juego
 		inc retardoTiempo
-        mov BX, [velocidad]
-        cmp [transcurrido], BX
-        je ir_a_mover_carros
-        jmp continuar_ciclo_juego1
-ir_a_mover_carros:
-        mov [transcurrido], 00
-        call mover_carros
-continuar_ciclo_juego1:
-        inc transcurrido
+        mov BX, [velocidad1]
+        cmp [transcurrido1], BX
+        je ir_a_mover_carros_verdes
+        jmp continuar_ciclo_juego_azules
+ir_a_mover_carros_verdes:
+        mov [transcurrido1], 00
+        call mover_carros_verdes
+continuar_ciclo_juego_azules:
+        inc transcurrido1
+		mov BX, [velocidad2]
+        cmp [transcurrido2], BX
+		je ir_a_mover_carros_azules
+		jmp continuar_ciclo_juego_naranjas
+ir_a_mover_carros_azules:
+		mov [transcurrido2], 00
+        call mover_carros_azules
+continuar_ciclo_juego_naranjas:
+        inc transcurrido2
+		mov BX, [velocidad3]
+        cmp [transcurrido3], BX
+		je ir_a_mover_carros_naranjas
+        jmp continuar_ciclo_juego
+ir_a_mover_carros_naranjas:
+		mov [transcurrido3], 00
+        call mover_carros_naranjas
+continuar_ciclo_juego:
+		inc transcurrido3
 		jmp ciclo_juego1
 
 game_over:
@@ -664,69 +719,75 @@ imprimirPuntosGameOver:
         call delay
 		ret
 
-mover_carros:
+mover_carros_verdes:
         ;; carro fila 1
         mover_carroN loc1, 02, dir1, CARRO1
         actualizar_posicion_carroN dir1, loc1
-        ;; carro fila 2
-        mover_carroN loc2, 03, dir2, CARRO2
-        actualizar_posicion_carroN dir2, loc2
-        ;; carro fila 3
-        mover_carroN loc3, 04, dir3, CARRO3
-        actualizar_posicion_carroN dir3, loc3
         ;; carro fila 4
-        mover_carroN loc4, 05, dir4, CARRO1
+        mover_carroN loc4, 05, dir4, CARRO2
         actualizar_posicion_carroN dir4, loc4
-        ;; carro fila 5
-        mover_carroN loc5, 06, dir5, CARRO2
-        actualizar_posicion_carroN dir5, loc5
-        ;; carro fila 6
-        mover_carroN loc6, 07, dir6, CARRO3
-        actualizar_posicion_carroN dir6, loc6
         ;; carro fila 7
-        mover_carroN loc7, 08, dir7, CARRO1
+        mover_carroN loc7, 08, dir7, CARRO3
         actualizar_posicion_carroN dir7, loc7
-        ;; carro fila 8
-        mover_carroN loc8, 09, dir8, CARRO2
-        actualizar_posicion_carroN dir8, loc8
-        ;; carro fila 9
-        mover_carroN loc9, 0a, dir9, CARRO3
-        actualizar_posicion_carroN dir9, loc9
         ;; carro fila 10
-        mover_carroN loc10, 0b, dir10, CARRO1
+        mover_carroN loc10, 0b, dir10, CARRO4
         actualizar_posicion_carroN dir10, loc10
-        ;; carro fila 11
-        mover_carroN loc11, 0c, dir11, CARRO2
-        actualizar_posicion_carroN dir11, loc11
-        ;; carro fila 12
-        mover_carroN loc12, 0d, dir12, CARRO3
-        actualizar_posicion_carroN dir12, loc12
         ;; carro fila 13
         mover_carroN loc13, 0e, dir13, CARRO1
         actualizar_posicion_carroN dir13, loc13
-        ;; carro fila 14
-        mover_carroN loc14, 0f, dir14, CARRO2
-        actualizar_posicion_carroN dir14, loc14
-        ;; carro fila 15
-        mover_carroN loc15, 10, dir15, CARRO3
-        actualizar_posicion_carroN dir15, loc15
         ;; carro fila 16
-        mover_carroN loc16, 11, dir16, CARRO1
+        mover_carroN loc16, 11, dir16, CARRO2
         actualizar_posicion_carroN dir16, loc16
-        ;; carro fila 17
-        mover_carroN loc17, 12, dir17, CARRO2
-        actualizar_posicion_carroN dir17, loc17
-        ;; carro fila 18
-        mover_carroN loc18, 13, dir18, CARRO3
-        actualizar_posicion_carroN dir18, loc18
         ;; carro fila 19
-        mover_carroN loc19, 14, dir19, CARRO1
+        mover_carroN loc19, 14, dir19, CARRO3
         actualizar_posicion_carroN dir19, loc19
+        ret
+
+mover_carros_azules:
+        ;; carro fila 2
+        mover_carroN loc2, 03, dir2, CARRO4
+        actualizar_posicion_carroN dir2, loc2
+        ;; carro fila 5
+        mover_carroN loc5, 06, dir5, CARRO1
+        actualizar_posicion_carroN dir5, loc5
+        ;; carro fila 8
+        mover_carroN loc8, 09, dir8, CARRO2
+        actualizar_posicion_carroN dir8, loc8
+        ;; carro fila 11
+        mover_carroN loc11, 0c, dir11, CARRO3
+        actualizar_posicion_carroN dir11, loc11
+        ;; carro fila 14
+        mover_carroN loc14, 0f, dir14, CARRO4
+        actualizar_posicion_carroN dir14, loc14
+        ;; carro fila 17
+        mover_carroN loc17, 12, dir17, CARRO1
+        actualizar_posicion_carroN dir17, loc17
         ;; carro fila 20
         mover_carroN loc20, 15, dir20, CARRO2
         actualizar_posicion_carroN dir20, loc20
+        ret
+
+mover_carros_naranjas:
+        ;; carro fila 3
+        mover_carroN loc3, 04, dir3, CARRO3
+        actualizar_posicion_carroN dir3, loc3
+        ;; carro fila 6
+        mover_carroN loc6, 07, dir6, CARRO4
+        actualizar_posicion_carroN dir6, loc6
+        ;; carro fila 9
+        mover_carroN loc9, 0a, dir9, CARRO1
+        actualizar_posicion_carroN dir9, loc9
+        ;; carro fila 12
+        mover_carroN loc12, 0d, dir12, CARRO2
+        actualizar_posicion_carroN dir12, loc12
+        ;; carro fila 15
+        mover_carroN loc15, 10, dir15, CARRO3
+        actualizar_posicion_carroN dir15, loc15
+        ;; carro fila 18
+        mover_carroN loc18, 13, dir18, CARRO4
+        actualizar_posicion_carroN dir18, loc18
         ;; carro fila 21
-        mover_carroN loc21, 16, dir21, CARRO3
+        mover_carroN loc21, 16, dir21, CARRO1
         actualizar_posicion_carroN dir21, loc21
         ret
 
@@ -1151,6 +1212,9 @@ ciclo_h:
 		cmp DL, CARRO3
 		je pintar_carro3_mapa
 		;;
+		cmp DL, CARRO4
+		je pintar_carro4_mapa
+		;;
 		cmp DL, OBJETIVO
 		je pintar_objetivo_mapa
 		;;
@@ -1219,6 +1283,14 @@ pintar_carro3_mapa:
 		call adaptar_coordenada
 		mov SI, offset dim_sprite_carro3
 		mov DI, offset data_sprite_carro3
+		call pintar_sprite
+		pop AX
+		jmp continuar_h
+pintar_carro4_mapa:
+		push AX
+		call adaptar_coordenada
+		mov SI, offset dim_sprite_carro4
+		mov DI, offset data_sprite_carro4
 		call pintar_sprite
 		pop AX
 		jmp continuar_h
@@ -1323,6 +1395,8 @@ pintar_posicion:
 		je pintar_carro2_mapa_p
 		cmp DL, CARRO3
 		je pintar_carro3_mapa_p
+		cmp DL, CARRO4
+		je pintar_carro4_mapa_p
 		cmp DL, OBJETIVO
 		je pintar_objetivo_mapa_p
 		cmp DL, CARRIL
@@ -1380,6 +1454,14 @@ pintar_carro3_mapa_p:
 		call adaptar_coordenada
 		mov SI, offset dim_sprite_carro3
 		mov DI, offset data_sprite_carro3
+		call pintar_sprite
+		pop AX
+		jmp terminar_perimetro
+pintar_carro4_mapa_p:
+		push AX
+		call adaptar_coordenada
+		mov SI, offset dim_sprite_carro4
+		mov DI, offset data_sprite_carro4
 		call pintar_sprite
 		pop AX
 		jmp terminar_perimetro
@@ -1497,6 +1579,8 @@ mover_jugador_arriba:
         je limpiar_posicion_actual
         cmp DL, CARRO3
         je limpiar_posicion_actual
+        cmp DL, CARRO4
+        je limpiar_posicion_actual
         cmp DL, OBJETIVO
         je posicionar_jugador_a_1
 posicionar_jugador_1:
@@ -1553,6 +1637,8 @@ mover_jugador_abajo:
         je limpiar_posicion_actual
         cmp DL, CARRO3
         je limpiar_posicion_actual
+		cmp DL, CARRO4
+        je limpiar_posicion_actual
         cmp DL, ACERA
         je posicionar_jugador_a_2
 posicionar_jugador_2:
@@ -1607,6 +1693,8 @@ mover_jugador_izquierda:
         cmp DL, CARRO2
         je limpiar_posicion_actual
         cmp DL, CARRO3
+        je limpiar_posicion_actual
+		cmp DL, CARRO4
         je limpiar_posicion_actual
         cmp DL, OBJETIVO
         je posicionar_jugador_a_3
@@ -1670,6 +1758,8 @@ mover_jugador_derecha:
         je limpiar_posicion_actual
         cmp DL, CARRO3
         je limpiar_posicion_actual
+		cmp DL, CARRO4
+        je limpiar_posicion_actual
         cmp DL, OBJETIVO
         je posicionar_jugador_a_4
         cmp DL, ACERA
@@ -1723,6 +1813,8 @@ fin_entrada_juego:
         cmp DL, CARRO2
         je reiniciar_en_acera
         cmp DL, CARRO3
+        je reiniciar_en_acera
+        cmp DL, CARRO4
         je reiniciar_en_acera
         jmp fin_fin_entrada_juego
 limpiar_posicion_actual:
