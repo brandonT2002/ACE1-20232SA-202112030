@@ -104,6 +104,24 @@ data_sprite_obj     db   17, 17, 17, 17, 17, 17, 17, 17
                     db   17, 17, 17, 17, 17, 17, 17, 17
 mapa                db   400 dup (0)
 tag                 db   "$"
+;; 
+esquina1            db      0c9, "$"
+esquina2            db      0bb, "$"
+esquina3            db      0c8, "$"
+esquina4            db      0bc, "$"
+lateral1            db      0cc, "$"
+lateral2            db      0b9, "$"
+lineas              db      26 dup (0cd), "$"
+universidad         db      0ba, " Universidad de San Carlos de         ", 0ba
+					db      0ba, " Guatemala                            ", 0ba, "$"
+facultad            db      0ba, " Facultad de Ingenieria               ", 0ba, "$"
+curso               db      0ba, " Arquitectura de Computadoras y       ", 0ba
+					db      0ba, " Ensambladores 1                      ", 0ba, "$"
+seccion             db      0ba, " Seccion A                            ", 0ba, "$"
+semestre            db      0ba, " Segundo Semestre 2023                ", 0ba, "$"
+nombre              db      0ba, " Nombre: Brandon Andy Jefferson       ", 0ba
+					db      0ba, "         Tejaxun Pichiya              ", 0ba, "$"
+carnet              db      0ba, " Carne: 202112030                     ", 0ba, "$"
 ;; PANTALLA MENÚ INICIAL
 iniciar_sesion      db   "F1  INICIAR SESION$"
 registros           db   "F2  REGISTRO$"
@@ -120,11 +138,13 @@ salir_al_menu       db   "F2 SALIR AL MENU$"
 cadena_pedir_nombre db   "NOMBRE: $"
 cadena_pedir_contra db   "CLAVE:  $"
 ;; PANTALLA JUEGO
-iniciales           db   "usuarioxyz$"
+iniciales           db   "brandon$"
 conteo_vidas3       db   "O  O  O$"
 conteo_vidas2       db   "X  O  O$"
 conteo_vidas1       db   "X  X  O$"
 conteo_vidas0       db   "X  X  X$"
+game_over_msg       db   "GAME OVER$"
+nl                  db   0a, "$"
 ;; JUEGO
 xJugador            db   14
 yJugador            db   17
@@ -323,11 +343,41 @@ reset_x_derecha:
 fin_actualizar_posicion_carroN:
 endm
 
+print macro texto
+        mov DX, offset texto
+        mov AH, 09
+        int 21
+endm
+
 		;; MODO VIDEO ;;
 		mov AH, 00
 		mov AL, 13
 		int 10
 		;;;;;;;;;;;;;;;;
+		;; PANTALLA DE PRESENTACIÓN
+		mov DH, 06
+		mov DL, 00
+		mov BH, 00
+		mov AH, 02
+		int 10
+		;;
+		print esquina1
+        print lineas
+        print esquina2
+        print universidad
+        print facultad
+        print curso
+        print seccion
+        print semestre
+        print lateral1
+        print lineas
+        print lateral2
+        print nombre
+        print carnet
+        print esquina3
+        print lineas
+        print esquina4
+		
 
 menu_inicial:
         call menu_inicial_opciones
@@ -409,7 +459,7 @@ menu:
 		;;;;;;;;;;;;;;;;
 
 jugar:
-        call limpiarMovs
+        call reiniciarPunteo
 modo_juego:
 		call limpiarTiempo
         cmp [numeroNivel], 01
@@ -596,15 +646,23 @@ continuar_ciclo_juego1:
 		jmp ciclo_juego1
 
 game_over:
-        call imprimirPuntos
-        call delay
-        call delay
-        call delay
-        call delay
-        call delay
-        call delay
-        call delay
+		call limpiar_pantalla
+        call imprimirPuntosGameOver
         jmp menu
+
+imprimirPuntosGameOver:
+		call imprimirPuntos_GameOver
+        call delay
+        call delay
+        call delay
+        call delay
+        call delay
+        call delay
+        call delay
+        call delay
+        call delay
+        call delay
+		ret
 
 mover_carros:
         ;; carro fila 1
@@ -682,19 +740,19 @@ subir_nivel:
 cargar_un_nivel:
         call limpiar_pantalla
         ;; ===================== ACERA OBJETIVO =====================
+		mov DL, OBJETIVO
         mov [xContador], 00
 bucle_acera1:
 		mov AH, [xContador]  ;; X
 		mov AL, 01           ;; Y
-		mov DL, OBJETIVO
         call colocar_en_mapa
         inc [xContador]
         cmp [xContador], 27
         jle bucle_acera1
         ;; ======================== CARRILES ========================
+		mov DL, CARRIL
         mov [yContador], 02
 bucle_carrilesY:
-		mov DL, CARRIL
         mov [xContador], 00
 bucle_carrilesX:
 		mov AH, [xContador] ;; X
@@ -708,10 +766,10 @@ bucle_carrilesX:
         jle bucle_carrilesY
         ;; ===================== ACERA INICIAL ======================
         mov [xContador], 00
+		mov DL, ACERA
 bucle_acera2:
 		mov AH, [xContador]  ;; X
-		mov AL, 017          ;; Y
-		mov DL, ACERA
+		mov AL, 17           ;; Y
         call colocar_en_mapa
         inc [xContador]
         cmp [xContador], 27
@@ -1810,8 +1868,8 @@ lengthBuffer:
 		ret
 ;;
 imprimirVidas:
-		mov DL, 10
-        mov DH, 00
+		mov DL, 10 ;; X: PANTALLA
+        mov DH, 00 ;; Y: PANTALLA
 		mov BH, 00
 		mov AH, 02
 		int 10
@@ -1879,8 +1937,52 @@ imprimirPuntos:
 		int 21
 		pop DX
 		ret
+;;
+imprimirPuntos_GameOver:
+		;; <<-- POSICIONAR EL CURSOR
+		mov DL, 0f        ; COLUMNA
+		mov DH, 09        ; FILA
+		mov BH, 00        ; NÚMERO DE PÁGINA
+		mov AH, 02
+		int 10
+		push DX
+		mov DX, offset game_over_msg
+		mov AH, 09
+		int 21
+		pop DX
+		;; <<-- POSICIONAR EL CURSOR
+		mov DL, 11        ; COLUMNA
+		mov DH, 10        ; FILA
+		mov BH, 00        ; NÚMERO DE PÁGINA
+		mov AH, 02
+		int 10
+		;; IMPRESIÓN DEL MENSAJE
+		push DX
+		mov DX, offset movimientosM
+		mov AH, 09
+		int 21
+		pop DX
+		;; IMPRESIÓN DEL MENSAJE
+		push DX
+		mov DX, offset movimientosC
+		mov AH, 09
+		int 21
+		pop DX
+		;; IMPRESIÓN DEL MENSAJE
+		push DX
+		mov DX, offset movimientosD
+		mov AH, 09
+		int 21
+		pop DX
+		;; IMPRESIÓN DEL MENSAJE
+		push DX
+		mov DX, offset movimientosU
+		mov AH, 09
+		int 21
+		pop DX
+		ret
 
-limpiarMovs:
+reiniciarPunteo:
 		mov [movimientosM], 30
 		mov [movimientosC], 30
 		mov [movimientosD], 30
